@@ -1,0 +1,48 @@
+---
+title: "Temp to Color"
+output: html_document
+date: "2024-04-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library(tidyverse)
+
+# Temperatire data retrieved from https://www.weather.gov/wrh/Climate?wfo=lwx
+
+# Load the temperature data
+temp.date.df <- as.data.frame(read_csv("2024_temps.csv"))
+
+temp.date.df$date <- as.Date(temp.date.df$date, "%m/%d/%y")
+
+# Define temperature ranges and corresponding colors
+temperature_ranges <- c(10, 20, 32, 40, 50, 60, 70, 80, 90)
+colors <- c("lavender", "blue", "aquamarine", "green", "yellow", "orange", "coral", "red", "white")
+
+
+# Function to determine color based on temperature
+assign_color <- function(temperature) {
+  for (i in 1:(length(temperature_ranges) - 1)) {
+    if (temperature >= temperature_ranges[i] && 
+        temperature < temperature_ranges[i + 1]) {
+      return(colors[i])
+    }
+  }
+  return('navy')  # Default color if temperature is not in any defined range
+}
+
+# Create a new column for the assigned color and order rows by date
+temp.date.df <- temp.date.df %>%
+  mutate(Color = sapply(avg, assign_color)) %>% 
+  arrange(date)
+
+# Export the color list df
+write_csv(temp.date.df, "temp_color_list.csv")
+
+
+```
